@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="LeadToOpportunity.API/LeadToOpportunity.API.csproj" />
+  <Project Path="LeadToOpportunity.BLL/LeadToOpportunity.BLL.csproj" />
+  <Project Path="LeadToOpportunity.DAL/LeadToOpportunity.DAL.csproj" />
+  <Project Path="LeadToOpportunity.Models/LeadToOpportunity.Models.csproj" />
+  <Project Path="LeadToOpportunity.Shared/LeadToOpportunity.Shared.csproj" />
+</Solution>
