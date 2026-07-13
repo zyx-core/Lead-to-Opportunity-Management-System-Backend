@@ -1,4 +1,6 @@
 using System.Text;
+using LeadToOpportunity.API.Middleware;
+using LeadToOpportunity.BLL.DTOs.Opportunities;
 using LeadToOpportunity.BLL.interfaces;
 using LeadToOpportunity.BLL.Interfaces;
 using LeadToOpportunity.BLL.Services;
@@ -6,22 +8,27 @@ using LeadToOpportunity.BLL.Settings;
 using LeadToOpportunity.DAL.Data;
 using LeadToOpportunity.DAL.Interfaces;
 using LeadToOpportunity.DAL.Repositories;
+using LeadToOpportunity.DAL.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===========================
-// Controllers
-// ===========================
-builder.Services.AddControllers();
 
-// ===========================
-// Swagger
-// ===========================
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });;
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -106,6 +113,17 @@ builder.Services
         };
     });
 
+    builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddAuthorization();
 
 // ===========================
@@ -114,18 +132,23 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IOpportunityService, OpportunityService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-
+builder.Services.AddScoped<ILeadReviewRepository, LeadReviewRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-
+builder.Services.AddScoped<IOpportunityRepository, OpportunityRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<ILeadRepository, LeadRepository>();
+builder.Services.AddScoped<ILeadService , LeadService>();
+builder.Services.AddScoped<IUserService ,UserService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 var app = builder.Build();
 
-// ===========================
-// Middleware
-// ===========================
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -136,7 +159,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseHttpsRedirection();
+app.UseCors("AngularPolicy");
 
 app.UseAuthentication();
 
