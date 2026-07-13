@@ -5,5 +5,5 @@ namespace LeadToOpportunity.BLL.interfaces;
 public interface IPasswordService
 {
     string HashPassword(User user, string password);
-    string VerifyPassword(User user,string password,string PasswordHash);
+    bool VerifyPassword(User user, string password, string passwordHash);
 }

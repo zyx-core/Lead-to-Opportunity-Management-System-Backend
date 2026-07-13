@@ -4,12 +4,17 @@ namespace LeadToOpportunity.Models.Entities;
 
 public class Opportunity : BaseEntity
 {
-    public int LeadId {get;set;}
-    public Lead Lead {get;set;} = null!;
-    public int OwnerId {get;set;}
-    public User Owner {get;set;} = null!;
-    public OpportunityStage Stage {get;set;}
-    public DateTime ExpectedCloseDate {get;set;}
-    public decimal EstimatedValue {get;set;} 
+    public int LeadId { get; set; }
+
+    public Lead Lead { get; set; } = null!;
+
+    public OpportunityStage Stage { get; set; }
+        = OpportunityStage.Qualification;
+
+    public decimal EstimatedValue { get; set; }
+
+    public DateTime ExpectedClosureDate { get; set; }
+
+    public string? Notes { get; set; } 
 
     }

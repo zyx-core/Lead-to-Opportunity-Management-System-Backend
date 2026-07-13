@@ -3,10 +3,12 @@
   <ItemGroup>
     <ProjectReference Include="..\LeadToOpportunity.Models\LeadToOpportunity.Models.csproj" />
     <ProjectReference Include="..\LeadToOpportunity.Shared\LeadToOpportunity.Shared.csproj" />
+    <ProjectReference Include="..\LeadToOpportunity.DAL\LeadToOpportunity.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.9" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1" />
   </ItemGroup>
 
   <PropertyGroup>

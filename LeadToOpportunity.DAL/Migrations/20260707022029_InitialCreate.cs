@@ -152,34 +152,29 @@ namespace LeadToOpportunity.DAL.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Oppertunities",
+                name: "Opportunities",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     LeadId = table.Column<int>(type: "int", nullable: false),
-                    OwnerId = table.Column<int>(type: "int", nullable: false),
                     Stage = table.Column<int>(type: "int", nullable: false),
-                    ExpectedCloseDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EstimatedValue = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ExpectedClosureDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Notes = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Oppertunities", x => x.Id);
+                    table.PrimaryKey("PK_Opportunities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Oppertunities_Leads_LeadId",
+                        name: "FK_Opportunities_Leads_LeadId",
                         column: x => x.LeadId,
                         principalTable: "Leads",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Oppertunities_Users_OwnerId",
-                        column: x => x.OwnerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -209,15 +204,10 @@ namespace LeadToOpportunity.DAL.Migrations
                 column: "CreatedByEmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Oppertunities_LeadId",
-                table: "Oppertunities",
+                name: "IX_Opportunities_LeadId",
+                table: "Opportunities",
                 column: "LeadId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Oppertunities_OwnerId",
-                table: "Oppertunities",
-                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -236,7 +226,7 @@ namespace LeadToOpportunity.DAL.Migrations
                 name: "LeadReviews");
 
             migrationBuilder.DropTable(
-                name: "Oppertunities");
+                name: "Opportunities");
 
             migrationBuilder.DropTable(
                 name: "Leads");

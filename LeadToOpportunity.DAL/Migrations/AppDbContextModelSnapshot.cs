@@ -196,14 +196,15 @@ namespace LeadToOpportunity.DAL.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("ExpectedCloseDate")
+                    b.Property<DateTime>("ExpectedClosureDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("LeadId")
                         .HasColumnType("int");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<int>("Stage")
                         .HasColumnType("int");
@@ -216,9 +217,7 @@ namespace LeadToOpportunity.DAL.Migrations
                     b.HasIndex("LeadId")
                         .IsUnique();
 
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("Oppertunities", (string)null);
+                    b.ToTable("Opportunities", (string)null);
                 });
 
             modelBuilder.Entity("LeadToOpportunity.Models.Entities.User", b =>
@@ -326,15 +325,7 @@ namespace LeadToOpportunity.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LeadToOpportunity.Models.Entities.User", "Owner")
-                        .WithMany("Opportunities")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Lead");
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("LeadToOpportunity.Models.Entities.Lead", b =>
@@ -349,8 +340,6 @@ namespace LeadToOpportunity.DAL.Migrations
                     b.Navigation("AssignedLeads");
 
                     b.Navigation("CreatedLeads");
-
-                    b.Navigation("Opportunities");
                 });
 #pragma warning restore 612, 618
         }

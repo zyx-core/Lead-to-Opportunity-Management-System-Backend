@@ -20,6 +20,6 @@ public class User : BaseEntity
 
     public ICollection<Lead> CreatedLeads {get; set;} = new List<Lead>();
     public ICollection<Lead> AssignedLeads {get; set;} = new List<Lead>();
-    public ICollection<Opportunity>Opportunities {get;set;} = new List<Opportunity>();
+    
 
 }

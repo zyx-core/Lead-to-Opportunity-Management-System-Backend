@@ -1,6 +1,6 @@
-namespace LeadToOpportunity.BLL.DTOs;
+namespace LeadToOpportunity.BLL.Settings;
 
-public class JwtSettings
+public class JwtSetting
 {
     public string Key {get; set;}= string.Empty;
     public string Issuer {get;set; } = string.Empty;

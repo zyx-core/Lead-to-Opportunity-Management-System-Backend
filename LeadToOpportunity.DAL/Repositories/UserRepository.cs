@@ -17,12 +17,13 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return await _dbSet.FirstOrDefaultAsync(u=>u.Email == email);
     }
 
-    public async Task<IEnumerable<User>> GetManagerAsync()
+    public async Task<IEnumerable<User>> GetManagersAsync()
     {
-        return await _dbSet.Where(u=>u.Role==UserRole.Manager)
+        return await _context.Users 
+        .Where(u=>u.Role==UserRole.Manager)
         .ToListAsync();
     }
-    public async Task<IEnumerable<User>> GetEmployeeAsync()
+    public async Task<IEnumerable<User>> GetEmployeesAsync()
     {
         return await _dbSet
         .Where(u=>u.Role==UserRole.Employee)
