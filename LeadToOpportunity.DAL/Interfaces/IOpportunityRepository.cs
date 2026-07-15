@@ -11,4 +11,10 @@ public interface IOpportunityRepository : IGenericRepository<Opportunity>
 
     Task<int > CountByStageAsync(OpportunityStage stage);
     Task<int> CountOpenOpportunitiesAsync();
+
+    Task<IEnumerable<Opportunity>> GetByEmployeeIdAsync(int employeeId);
+
+    Task<decimal> GetTotalEstimatedValueAsync();
+
+    Task<Dictionary<OpportunityStage, int>> GetCountByStageAsync();
 }

@@ -52,6 +52,16 @@ public class DashboardService : IDashboardService
     public async Task<ManagerDashboardDto> GetManagerDashboardAsync(
     int managerId)
 {
+    var stageCounts = await _opportunityRepository.GetCountByStageAsync();
+
+    var opportunitiesByStage = stageCounts
+        .Select(kv => new OpportunityStageCountDto
+        {
+            Stage = kv.Key.ToString(),
+            Count = kv.Value
+        })
+        .ToList();
+
     return new ManagerDashboardDto
     {
         PendingReviews =
@@ -74,8 +84,6 @@ public class DashboardService : IDashboardService
                 managerId,
                 LeadStatus.ModificationRequested),
 
-       
-
         WonDeals =
             await _opportunityRepository.CountByStageAsync(
                 OpportunityStage.Won),
@@ -86,6 +94,31 @@ public class DashboardService : IDashboardService
 
         OpenOpportunities =
              await _opportunityRepository.CountOpenOpportunitiesAsync(),
+
+        TotalSubmitted = await _leadRepository.CountTotalSubmittedAsync(),
+
+        ConvertedLeads = await _leadRepository.CountConvertedAsync(),
+
+        TotalPipelineValue = await _opportunityRepository.GetTotalEstimatedValueAsync(),
+
+        OpportunitiesByStage = opportunitiesByStage
     };
+}
+
+public async Task<IEnumerable<ManagerWorkloadDto>> GetManagerWorkloadAsync()
+{
+    var leads = await _leadRepository.GetAllWithManagerAsync();
+
+    return leads
+        .Where(l => l.Status == LeadStatus.UnderReview && l.AssignedManager != null)
+        .GroupBy(l => l.AssignedManagerId)
+        .Select(g => new ManagerWorkloadDto
+        {
+            ManagerId = g.Key!.Value,
+            ManagerName = $"{g.First().AssignedManager!.FirstName} {g.First().AssignedManager!.LastName}",
+            PendingReviews = g.Count()
+        })
+        .OrderByDescending(w => w.PendingReviews)
+        .ToList();
 }
 }

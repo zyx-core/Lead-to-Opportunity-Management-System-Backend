@@ -17,12 +17,19 @@ public class LeadRepository : GenericRepository<Lead>, ILeadRepository
       
     }
     
-    public async Task<IEnumerable<Lead>>GetByEmployeeAsync(int employeeId)
+    public async Task<(IEnumerable<Lead> Items, int TotalCount)> GetByEmployeeAsync(int employeeId, int pageNumber, int pageSize)
     {
-        return await _context.Leads
-        .Where(l => l.CreatedByEmployeeId == employeeId)
-        .OrderByDescending(l => l.CreatedAt)
-        .ToListAsync();
+        var query = _context.Leads.Where(l => l.CreatedByEmployeeId == employeeId);
+        
+        var totalCount = await query.CountAsync();
+        
+        var items = await query
+            .OrderByDescending(l => l.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+            
+        return (items, totalCount);
     }
 
     public async Task<Lead?> GetEmployeeLeadByIdAsync(int LeadId, int employeeId)
@@ -48,14 +55,20 @@ public class LeadRepository : GenericRepository<Lead>, ILeadRepository
         
     }
 
-    public async Task<IEnumerable<Lead>> GetManagerLeadsAsync(int managerId)
+    public async Task<(IEnumerable<Lead> Items, int TotalCount)> GetManagerLeadsAsync(int managerId, int pageNumber, int pageSize)
     {
-        return await _context.Leads
-        .Where(l=>
-        l.AssignedManagerId == managerId &&
-        l.Status == LeadStatus.UnderReview
-        ).OrderByDescending(l=>l.CreatedAt)
-        .ToListAsync();
+        var query = _context.Leads
+            .Where(l => l.AssignedManagerId == managerId && l.Status == LeadStatus.UnderReview)
+            .OrderByDescending(l => l.CreatedAt);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task<Lead?> GetLeadForApprovalAsync(
@@ -97,13 +110,41 @@ public class LeadRepository : GenericRepository<Lead>, ILeadRepository
         l.Status == status);
     }
 
-    public async Task<IEnumerable<Lead>> GetPipelineAsync()
+    public async Task<(IEnumerable<Lead> Items, int TotalCount)> GetPipelineAsync(int pageNumber, int pageSize)
+    {
+        var query = _context.Leads
+            .Include(l => l.CreatedByEmployee)
+            .Include(l => l.AssignedManager)
+            .Include(l => l.Opportunity)
+            .OrderByDescending(l => l.CreatedAt);
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+public async Task<int> CountTotalSubmittedAsync()
 {
     return await _context.Leads
-        .Include(l => l.CreatedByEmployee)
+        .CountAsync(l => l.Status != LeadStatus.Draft);
+}
+
+public async Task<int> CountConvertedAsync()
+{
+    return await _context.Leads
+        .CountAsync(l => l.Status == LeadStatus.Converted);
+}
+
+public async Task<IEnumerable<Lead>> GetAllWithManagerAsync()
+{
+    return await _context.Leads
         .Include(l => l.AssignedManager)
-        .Include(l => l.Opportunity)
-        .OrderByDescending(l => l.CreatedAt)
+        .Where(l => l.AssignedManagerId != null)
         .ToListAsync();
 }
 }

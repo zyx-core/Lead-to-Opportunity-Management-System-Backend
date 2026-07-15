@@ -4,4 +4,5 @@
   <Project Path="LeadToOpportunity.DAL/LeadToOpportunity.DAL.csproj" />
   <Project Path="LeadToOpportunity.Models/LeadToOpportunity.Models.csproj" />
   <Project Path="LeadToOpportunity.Shared/LeadToOpportunity.Shared.csproj" />
+  <Project Path="LeadToOpportunity.Tests/LeadToOpportunity.Tests.csproj" />
 </Solution>

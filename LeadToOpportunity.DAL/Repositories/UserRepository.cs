@@ -29,4 +29,18 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         .Where(u=>u.Role==UserRole.Employee)
         .ToListAsync();
     }
+
+    public async Task<(IEnumerable<User> Items, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
+    {
+        var query = _dbSet.OrderBy(u => u.Id);
+        
+        var totalCount = await query.CountAsync();
+        
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+            
+        return (items, totalCount);
+    }
 }

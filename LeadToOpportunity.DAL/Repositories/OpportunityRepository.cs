@@ -39,4 +39,26 @@ public async Task<int> CountByStageAsync(OpportunityStage stage)
         o.Stage != OpportunityStage.Won &&
         o.Stage != OpportunityStage.Lost);
 }
+
+public async Task<IEnumerable<Opportunity>> GetByEmployeeIdAsync(int employeeId)
+{
+    return await _context.Opportunities
+        .Include(o => o.Lead)
+        .Where(o => o.Lead.CreatedByEmployeeId == employeeId)
+        .ToListAsync();
+}
+
+public async Task<decimal> GetTotalEstimatedValueAsync()
+{
+    return await _context.Opportunities
+        .SumAsync(o => o.EstimatedValue);
+}
+
+public async Task<Dictionary<OpportunityStage, int>> GetCountByStageAsync()
+{
+    return await _context.Opportunities
+        .GroupBy(o => o.Stage)
+        .Select(g => new { Stage = g.Key, Count = g.Count() })
+        .ToDictionaryAsync(x => x.Stage, x => x.Count);
+}
 }

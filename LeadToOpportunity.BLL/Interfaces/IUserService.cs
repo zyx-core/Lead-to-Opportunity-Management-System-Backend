@@ -5,7 +5,7 @@ namespace LeadToOpportunity.BLL.Interfaces;
 public interface IUserService
 {
     Task<IEnumerable<ManagerDto>> GetManagersAsync();
-    Task<IEnumerable<UserResponseDto>> GetAllUsersAsync();
+    Task<LeadToOpportunity.Shared.Pagination.PagedResult<UserResponseDto>> GetAllUsersAsync(int pageNumber, int pageSize);
 
    Task<UserResponseDto> GetUserByIdAsync(int id);
 

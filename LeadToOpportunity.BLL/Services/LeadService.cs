@@ -93,11 +93,17 @@ public static class AuditAction
     return LeadMapper.ToResponseDto(lead);
    
     }
-     public async Task<IEnumerable<LeadResponseDto>> GetMyLeadAsync(int employeeId)
+     public async Task<LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>> GetMyLeadAsync(int employeeId, int pageNumber, int pageSize)
     {
-        var leads = await _leadRepository.GetByEmployeeAsync(employeeId);
+        var (items, totalCount) = await _leadRepository.GetByEmployeeAsync(employeeId, pageNumber, pageSize);
 
-        return leads.Select(LeadMapper.ToResponseDto);
+        return new LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>
+        {
+            Items = items.Select(LeadMapper.ToResponseDto),
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
     }
     public async Task<LeadResponseDto?> GetLeadByIdAsync(int leadId, int employeeId)
     {
@@ -207,10 +213,10 @@ public static class AuditAction
             );
         }
 
-        
+        var fromStatus = lead.Status.ToString();
+
          lead.AssignedManagerId = request.ManagerId;
-        lead.Status = LeadStatus.UnderReview;
-        
+        lead.Status = LeadStatus.Submitted;
 
         await _leadRepository.UpdateAsync(lead);
 
@@ -219,17 +225,35 @@ public static class AuditAction
             lead.Id,
             employeeId,
             AuditAction.Submitted,
-            LeadStatus.Draft.ToString(),
+            fromStatus,
+            LeadStatus.Submitted.ToString()
+        );
+
+        lead.Status = LeadStatus.UnderReview;
+
+        await _leadRepository.UpdateAsync(lead);
+
+        await _auditLogService.LogAsync(
+            AuditEntity.Lead,
+            lead.Id,
+            employeeId,
+            "Under Review",
+            LeadStatus.Submitted.ToString(),
             LeadStatus.UnderReview.ToString()
         );
 
-
     }
-    public async Task<IEnumerable<LeadResponseDto>> GetManagerLeadsAsync(int managerId)
+    public async Task<LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>> GetManagerLeadsAsync(int managerId, int pageNumber, int pageSize)
     {
-        var leads = await _leadRepository.GetManagerLeadsAsync(managerId);
+       var (items, totalCount) = await _leadRepository.GetManagerLeadsAsync(managerId, pageNumber, pageSize);
 
-        return leads.Select(l=>l.ToResponseDto());
+       return new LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>
+       {
+           Items = items.Select(LeadMapper.ToResponseDto),
+           TotalCount = totalCount,
+           PageNumber = pageNumber,
+           PageSize = pageSize
+       };
     }
 
     public async Task ApproveLeadAsync(
@@ -277,6 +301,20 @@ public static class AuditAction
             "",
             OpportunityStage.Qualification.ToString()
         );
+
+        lead.Status = LeadStatus.Converted;
+
+        await _leadRepository.UpdateAsync(lead);
+
+        await _auditLogService.LogAsync(
+            AuditEntity.Lead,
+            lead.Id,
+            managerId,
+            "Converted",
+            LeadStatus.Approved.ToString(),
+            LeadStatus.Converted.ToString()
+        );
+
         await transaction.CommitAsync();
         }
         catch
@@ -396,9 +434,9 @@ public static class AuditAction
         return LeadMapper.ToResponseDto(lead);
     }
 
-    public async Task AssignManagerAsync(int leadId,int adminId,AssignManagerRequestDto request)
+    public async Task AssignManagerAsync(int adminId,AssignManagerRequestDto request)
     {
-        var lead = await _leadRepository.GetByIdAsync(leadId);
+        var lead = await _leadRepository.GetByIdAsync(request.LeadId);
 
         if(lead == null)
         {
@@ -411,7 +449,12 @@ public static class AuditAction
         {
             throw new NotFoundException("Manager not found");
         }
-
+        if(!(lead.Status ==  LeadStatus.Draft || lead.Status == LeadStatus.UnderReview))
+        {
+            Console.WriteLine(lead.Status);
+            throw new BadRequestException("Manager already accepted");
+        }
+       
         if(manager.Role != UserRole.Manager)
         {
             throw new BadRequestException("Selected user is not a manager");
@@ -434,29 +477,28 @@ public static class AuditAction
 
     }
 
-    public async Task<IEnumerable<PipelineDto>> GetPipelineAsync()
-{
-    var leads = await _leadRepository.GetPipelineAsync();
-
-    return leads.Select(l => new PipelineDto
+    public async Task<LeadToOpportunity.Shared.Pagination.PagedResult<PipelineDto>> GetPipelineAsync(int pageNumber, int pageSize)
     {
-        LeadId = l.Id,
+        var (items, totalCount) = await _leadRepository.GetPipelineAsync(pageNumber, pageSize);
 
-        CompanyName = l.CompanyName,
+        var dtos = items.Select(l => new PipelineDto
+        {
+            LeadId = l.Id,
+            CompanyName = l.CompanyName,
+            EmployeeName = $"{l.CreatedByEmployee.FirstName} {l.CreatedByEmployee.LastName}",
+            ManagerName = l.AssignedManager == null ? "" : $"{l.AssignedManager.FirstName} {l.AssignedManager.LastName}",
+            LeadStatus = l.Status,
+            OpportunityStage = l.Opportunity?.Stage
+        });
 
-        EmployeeName =
-            $"{l.CreatedByEmployee.FirstName} {l.CreatedByEmployee.LastName}",
-
-        ManagerName =
-            l.AssignedManager == null
-                ? ""
-                : $"{l.AssignedManager.FirstName} {l.AssignedManager.LastName}",
-
-        LeadStatus = l.Status,
-
-        OpportunityStage = l.Opportunity?.Stage
-    });
-}
+        return new LeadToOpportunity.Shared.Pagination.PagedResult<PipelineDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
 
 
 }

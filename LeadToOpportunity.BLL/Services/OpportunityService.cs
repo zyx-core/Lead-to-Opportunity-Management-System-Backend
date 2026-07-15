@@ -127,4 +127,19 @@ var oldStage = opportunity.Stage;
     opportunity.Stage.ToString()
 );
 }
+
+public async Task<IEnumerable<OpportunityResponseDto>> GetByEmployeeIdAsync(int employeeId)
+{
+    var opportunities = await _opportunityRepository.GetByEmployeeIdAsync(employeeId);
+
+    return opportunities.Select(o => new OpportunityResponseDto
+    {
+        id = o.Id,
+        LeadId = o.LeadId,
+        CompanyName = o.Lead.CompanyName,
+        Stage = o.Stage,
+        EstimatedValue = o.EstimatedValue,
+        ExpectedClosureDate = o.ExpectedClosureDate
+    });
+}
 }

@@ -13,8 +13,8 @@ public interface ILeadService
         int employeeId
     );
 
-    Task<IEnumerable<LeadResponseDto>>GetMyLeadAsync(
-        int employeeId
+    Task<LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>> GetMyLeadAsync(
+        int employeeId, int pageNumber, int pageSize
     );
 
     Task SubmitLeadAsync(
@@ -35,8 +35,8 @@ public interface ILeadService
         int leadId,
         int employeeId
     );
-    Task<IEnumerable<LeadResponseDto>> GetManagerLeadsAsync(
-        int managerId
+    Task<LeadToOpportunity.Shared.Pagination.PagedResult<LeadResponseDto>> GetManagerLeadsAsync(
+        int managerId, int pageNumber, int pageSize
         );
     Task ApproveLeadAsync(int LeadId , int managerId);  
 
@@ -49,9 +49,9 @@ public interface ILeadService
     Task <LeadResponseDto>GetManagerLeadByIdAsync(int leadId,
     int managerId);
 
-    Task AssignManagerAsync(int leadId,int adminId,AssignManagerRequestDto request);
+    Task AssignManagerAsync(int adminId,AssignManagerRequestDto request);
 
-    Task<IEnumerable<PipelineDto>> GetPipelineAsync();
+    Task<LeadToOpportunity.Shared.Pagination.PagedResult<PipelineDto>> GetPipelineAsync(int pageNumber, int pageSize);
 
     
 }

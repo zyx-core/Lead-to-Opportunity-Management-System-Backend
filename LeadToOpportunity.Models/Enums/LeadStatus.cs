@@ -6,7 +6,7 @@ namespace LeadToOpportunity.Models.Enums;
 public enum LeadStatus
 {
     Draft,
-    Submittted,
+    Submitted,
     UnderReview,
     ModificationRequested,
     Approved,

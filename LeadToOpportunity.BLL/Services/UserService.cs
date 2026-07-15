@@ -34,20 +34,28 @@ public class UserService : IUserService
         
     }
 
-    public async Task<IEnumerable<UserResponseDto>> GetAllUsersAsync()
-{
-    var users = await _userRepository.GetAllAsync();
-
-    return users.Select(u => new UserResponseDto
+    public async Task<LeadToOpportunity.Shared.Pagination.PagedResult<UserResponseDto>> GetAllUsersAsync(int pageNumber, int pageSize)
     {
-        Id = u.Id,
-        FirstName = u.FirstName,
-        LastName = u.LastName,
-        Email = u.Email,
-        Role = u.Role,
-        Region = u.Region
-    });
-}
+        var (items, totalCount) = await _userRepository.GetPagedUsersAsync(pageNumber, pageSize);
+
+        var dtos = items.Select(u => new UserResponseDto
+        {
+            Id = u.Id,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            Email = u.Email,
+            Role = u.Role,
+            Region = u.Region
+        });
+
+        return new LeadToOpportunity.Shared.Pagination.PagedResult<UserResponseDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
 public async Task<UserResponseDto> GetUserByIdAsync(int id)
 {
     var user = await _userRepository.GetByIdAsync(id);

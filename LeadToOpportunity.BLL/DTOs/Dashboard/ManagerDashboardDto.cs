@@ -15,4 +15,12 @@ public class ManagerDashboardDto
     public int WonDeals { get; set; }
 
     public int LostDeals { get; set; }
+
+    public int TotalSubmitted { get; set; }
+
+    public int ConvertedLeads { get; set; }
+
+    public decimal TotalPipelineValue { get; set; }
+
+    public List<OpportunityStageCountDto> OpportunitiesByStage { get; set; } = new();
 }

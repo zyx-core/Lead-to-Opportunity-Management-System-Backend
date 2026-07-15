@@ -12,5 +12,7 @@ public interface IOpportunityService
 
     Task MarkWonAsync (int id,int managerId);
     Task MarkLostAsync (int id,int managerId);
+
+    Task<IEnumerable<OpportunityResponseDto>> GetByEmployeeIdAsync(int employeeId);
    
 }
