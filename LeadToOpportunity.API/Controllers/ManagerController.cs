@@ -25,11 +25,11 @@ public class ManagerController : ControllerBase
     }
 
     [HttpGet("leads")]
-    public async Task<IActionResult> GetAssignedLeads()
+    public async Task<IActionResult> GetAssignedLeads([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
     {
-        var leads =await _leadService.GetManagerLeadsAsync(GetManagerId());
+        var pagedResult = await _leadService.GetManagerLeadsAsync(GetManagerId(), pageNumber, pageSize);
 
-        return Ok(leads);
+        return Ok(pagedResult);
     }
 
     [HttpPost("leads/{id}/approve")]

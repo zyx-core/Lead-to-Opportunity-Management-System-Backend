@@ -37,4 +37,12 @@ public async Task<IActionResult> GetManagerDashboard()
     var dashboard = await _dashboardService.GetManagerDashboardAsync(GetUserId());
     return Ok(dashboard);
 }
+
+[HttpGet("manager-workload")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> GetManagerWorkload()
+{
+    var workload = await _dashboardService.GetManagerWorkloadAsync();
+    return Ok(workload);
+}
 }

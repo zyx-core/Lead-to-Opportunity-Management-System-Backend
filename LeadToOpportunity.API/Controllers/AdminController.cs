@@ -25,10 +25,10 @@ public class AdminController : ControllerBase
 {
     return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 }
-    [HttpGet("users")]
-public async Task<IActionResult> GetAllUsers()
+[HttpGet("users")]
+public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
 {
-    var users = await _userService.GetAllUsersAsync();
+    var users = await _userService.GetAllUsersAsync(pageNumber, pageSize);
 
     return Ok(users);
 }
@@ -62,20 +62,19 @@ public async Task<IActionResult> UpdateUser(
     return NoContent();
 }
 
-[HttpPut("leads/{id}/assign-manager")]
+[HttpPut("dashboard/assign/manager")]
 public async Task<IActionResult> AssignManager(
-    int id,
     [FromBody] AssignManagerRequestDto request)
 {
-    await _leadService.AssignManagerAsync(id,GetAdminId(), request);
+    await _leadService.AssignManagerAsync(GetAdminId(), request);
 
     return NoContent();
 }
 
 [HttpGet("pipeline")]
-public async Task<IActionResult> GetPipeline()
+public async Task<IActionResult> GetPipeline([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
 {
-    var pipeline = await _leadService.GetPipelineAsync();
+    var pipeline = await _leadService.GetPipelineAsync(pageNumber, pageSize);
 
     return Ok(pipeline);
 }

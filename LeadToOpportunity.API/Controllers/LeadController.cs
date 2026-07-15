@@ -37,11 +37,11 @@ public class LeadController : ControllerBase
         return Ok(lead);
     }
     [HttpGet]
-public async Task<IActionResult> GetMyLeads()
+public async Task<IActionResult> GetMyLeads([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 5)
 {
-    var leads = await _leadService.GetMyLeadAsync(GetEmployeeId());
+    var pagedResult = await _leadService.GetMyLeadAsync(GetEmployeeId(), pageNumber, pageSize);
 
-    return Ok(leads);
+    return Ok(pagedResult);
 }
 
     [HttpGet("{id}")]

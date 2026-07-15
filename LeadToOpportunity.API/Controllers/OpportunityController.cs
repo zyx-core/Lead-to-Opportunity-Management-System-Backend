@@ -8,7 +8,7 @@ namespace LeadToOpportunity.API.Controllers;
 
 [ApiController]
 [Route("api/opportunities")]
-[Authorize(Roles ="Manager")]
+[Authorize]
 public class OpportunityController : ControllerBase
 {
     private readonly IOpportunityService _opportunityService;
@@ -24,6 +24,7 @@ public class OpportunityController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetAll()
     {
         var opportunity = await _opportunityService.GetAllAsync();
@@ -32,6 +33,7 @@ public class OpportunityController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetById(int id)
     {
         var opportunity = await _opportunityService.GetByIdAsync(id);
@@ -44,6 +46,7 @@ public class OpportunityController : ControllerBase
     }
 
     [HttpPut("{id}/stage")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> UpdateStage(int id,UpdateOpportunityStageDto request)
     {
         await _opportunityService.UpdateStageAsync(id,GetManagerId(), request);
@@ -52,6 +55,7 @@ public class OpportunityController : ControllerBase
     }
 
     [HttpPost("{id}/won")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> MarkWon(int id)
     {
         await _opportunityService.MarkWonAsync(id,GetManagerId());
@@ -59,11 +63,20 @@ public class OpportunityController : ControllerBase
     }
 
     [HttpPost("{id}/lost")]
-
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> MarkLost(int id)
     {
         await _opportunityService.MarkLostAsync(id,GetManagerId());
 
         return NoContent();
+    }
+
+    [HttpGet("my")]
+    [Authorize(Roles = "Employee")]
+    public async Task<IActionResult> GetMyOpportunities()
+    {
+        var employeeId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var opportunities = await _opportunityService.GetByEmployeeIdAsync(employeeId);
+        return Ok(opportunities);
     }
     }
