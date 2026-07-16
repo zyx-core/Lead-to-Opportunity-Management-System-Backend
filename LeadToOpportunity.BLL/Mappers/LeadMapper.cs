@@ -22,6 +22,7 @@ public static class LeadMapper
             Region = lead.Region,
             Status = lead.Status,
             CreatedAt = lead.CreatedAt,
+            ManagerId = lead.AssignedManagerId ?? 0,      
 
 
         ManagerComment = lead.Reviews

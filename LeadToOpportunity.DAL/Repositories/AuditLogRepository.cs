@@ -20,7 +20,7 @@ public class AuditLogRepository : GenericRepository<AuditLog>, IAuditLogReposito
             .Where(a =>
                 a.EntityType == entityType &&
                 a.EntityId == entityId)
-            .OrderBy(a => a.CreatedAt)
+            .OrderByDescending(a => a.CreatedAt)
             .ToListAsync();
     }
 }

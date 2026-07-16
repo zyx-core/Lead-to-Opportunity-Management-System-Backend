@@ -336,7 +336,7 @@ public static class AuditAction
         var lead = await _leadRepository.GetLeadForApprovalAsync(leadId, managerId);
         if(lead == null)
         {
-            throw new NotFoundException("lead not found");
+            throw new NotFoundException("lead not found or lead's under another user");
         }
 
         lead.Status = LeadStatus.Rejected;
@@ -388,6 +388,8 @@ public static class AuditAction
         {
             throw new NotFoundException("Lead not found");
         }
+
+       
 
         lead.Status = LeadStatus.ModificationRequested;
 

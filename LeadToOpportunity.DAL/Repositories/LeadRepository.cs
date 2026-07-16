@@ -58,7 +58,7 @@ public class LeadRepository : GenericRepository<Lead>, ILeadRepository
     public async Task<(IEnumerable<Lead> Items, int TotalCount)> GetManagerLeadsAsync(int managerId, int pageNumber, int pageSize)
     {
         var query = _context.Leads
-            .Where(l => l.AssignedManagerId == managerId && l.Status == LeadStatus.UnderReview)
+            .Where(l => l.AssignedManagerId == managerId)
             .OrderByDescending(l => l.CreatedAt);
 
         var totalCount = await query.CountAsync();

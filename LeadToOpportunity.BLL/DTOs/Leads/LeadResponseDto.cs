@@ -25,6 +25,8 @@ public class LeadResponseDto
 
     public string? ManagerComment { get; set; }
 
+    public int ManagerId {get; set;}
+
     public LeadStatus Status { get; set; }
 
     public DateTime CreatedAt { get; set; }
